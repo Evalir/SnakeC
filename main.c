@@ -138,8 +138,9 @@ int main(int argc, char *argv[]) {
 	char gameScreen[HEIGHT][WIDTH];
 	int snakeSize; //Tamanio de la serpiente.
 	
+	//Llamar a la funcion que comienza el juego.
 	startGame(&snakeSize, gameScreen);
 	
-		
+	//Pero Barinas!
 	return 0;
 }
