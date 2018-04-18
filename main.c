@@ -36,6 +36,12 @@ void readScreen(char gameScreen[HEIGHT][WIDTH]) {
 	}
 }
 
+//Generar sitio aleatorio para la comida del Snake.
+void generateFruit() {
+	fruitVar.x = rand() % (WIDTH-2) + 1;
+	fruitVar.y = rand() % (WIDTH- 2) + 1;
+}
+
 //Inicializar pantalla para el snake.
 void readInput(char gameScreen[HEIGHT][WIDTH], int snakeSize) {
 	int idx = 0;
@@ -58,6 +64,7 @@ void readInput(char gameScreen[HEIGHT][WIDTH], int snakeSize) {
 	gameScreen[fruitVar.y][fruitVar.x] = '@';
 }
 
+
 void drawGame(char gameScreen[HEIGHT][WIDTH]) {
 	int i, k;
 	
@@ -69,6 +76,7 @@ void drawGame(char gameScreen[HEIGHT][WIDTH]) {
 	}
 }
 
+//Verificar si hay una colision
 int snakeCollision(int *snakeSize) {
 	
 	int isDead = 0, i = 1;
@@ -83,15 +91,48 @@ int snakeCollision(int *snakeSize) {
 		return 0;
 }
 
+//Funcion que verifica si hay una colision con comida, y si la hay, regenerarla en un sitio aleatorio.
 void eatCollision(int *snakeSize) {
 	if (snakeArr[0].x == fruitVar.x && snakeArr[0].y == fruitVar.y) {
-		
+		*snakeSize++;
+		snakeArr[*snakeSize-1].bodyPart = '{'; // Hacer crecer la serpiente.
 	}
+	generateFruit();
 }
+
+//Esta funcion maneja el I/O para el juego.
 void readKB(char gameScreen[HEIGHT][WIDTH], int *snakeSize, int *isDead) {
-	
+	char key;
+	//Confirmar que no estemos muertos para leer el teclado.
 	*isDead = snakeCollision(snakeSize);
+	eatCollision(*snakeSize);
 	
+	if(*isDead == 0) {
+		if (kbhit() == 1) {
+			key = getch();
+			
+			//Para abajo, para abajo
+			if (key == 's' || key == 'S') {
+	 			snakeArr[0].dx = 0;
+	 			snakeArr[0].dy = 1;
+			}
+			//Para arriba, para arriba
+			if (key == 'w' || key == 'W') {
+				snakeArr[0].dx = 0;
+				snakeArr[0].dy = -1;
+			}
+			//Izquierda
+			if (key == 'a' || key == 'A')  {
+				snakeArr[0].dx = -1;
+				snakeArr[0].dy = 0;
+			}
+			//Derecha
+			if (key == 'd' || key == 'D') {
+				snakeArr[0].dx = 1;
+				snakeArr[0].dy = 1;
+			}
+		}
+	}
 	
 }
 
@@ -105,7 +146,7 @@ void logicLoop(char gameScreen[HEIGHT][WIDTH], int snakeSize) {
 	}
 }
 
-
+//Funcion de inicializacin para el juego.
 void startGame(int *snakeSize, char gameScreen[HEIGHT][WIDTH]) {
 	//Posiciona la cabeza del snake en estas coordenadas.
 	snakeArr[0].x = 32;
@@ -116,9 +157,8 @@ void startGame(int *snakeSize, char gameScreen[HEIGHT][WIDTH]) {
 	
 	//Posicionar la comida del snake aleatoreamente.
 	srand(time(NULL)); //Inicializar la funcion rand con el clock de la maquina (por default).
+	generateFruit();
 	
-	fruitVar.x = rand() % (WIDTH-2) + 1;
-	fruitVar.y = rand() % (WIDTH- 2) + 1;
 	//Poner a correr el snake a la derecha.
 	int idx;
 	for(idx = 0; idx < *snakeSize; idx++) {
@@ -128,8 +168,8 @@ void startGame(int *snakeSize, char gameScreen[HEIGHT][WIDTH]) {
 	
 	readScreen(gameScreen);
 	readInput(gameScreen, *snakeSize);
+	drawGame(gameScreen);
 }
-
 
 
 int main(int argc, char *argv[]) {
